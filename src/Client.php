@@ -1,6 +1,7 @@
 <?php
 namespace Lugasdev\Mynextcloud;
 
+use Jackiedo\XmlArray\Xml2Array;
 use Lugasdev\Mynextcloud\Exception\ClientException;
 use Sabre\DAV\Client as DAVClient;
 
@@ -12,7 +13,7 @@ class Client {
     function __construct($username, $password, $baseUri)
 	{
         $this->setting = [
-            'baseUri'  => $baseUri,
+            'baseUri'  => trim($baseUri, "/"),
             'userName' => $username,
             'password' => $password,
             // 'proxy'    => 'locahost:8888',
@@ -22,7 +23,7 @@ class Client {
     }
 
     /**
-     * get directory
+     * get entire directory
      *
      * @param string $directoryPath
      * @return array
@@ -71,6 +72,7 @@ class Client {
         if (!is_file($filePath)) {
             throw new ClientException('File Path is not valid');
         }
+
         $file = file_get_contents($filePath);
 
         if (empty($fileName)) {
@@ -79,7 +81,7 @@ class Client {
         }
 
         $filePath = trim($dirPathTarget, '/') . "/" . $fileName;
-        $urlPath  = $this->setting['baseUri'] . "files/" . $this->setting['userName'] . '/' . $filePath;
+        $urlPath  = $this->setting['baseUri'] . "/files/" . $this->setting['userName'] . '/' . $filePath;
 
         $response = $this->client->request('PUT', $urlPath , $file);
 
@@ -98,7 +100,7 @@ class Client {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL            => $this->setting['baseUri'] . "/dav/files/". $this->setting['userName'] ."/" . $filePath,
+            CURLOPT_URL            => $this->setting['baseUri'] . "/files/". $this->setting['userName'] ."/" . $filePath,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING       => "",
             CURLOPT_MAXREDIRS      => 10,
@@ -113,9 +115,20 @@ class Client {
 
         $response = curl_exec($curl);
 
-        curl_close($curl);
+        if ($response != "") {
+            $responseArray = Xml2Array::convert($response)->toArray();
 
-        return $response;
+            if (isset($responseArray["d:error"])) {
+                throw new ClientException(!empty($responseArray["d:error"]["s:message"]) ? $responseArray["d:error"]["s:message"] : "Directory Create Failed");
+            }
+
+            var_dump($responseArray);
+        }
+
+        curl_close($curl);
+        // echo $response;
+
+        return true;
     }
 
     /**
@@ -125,7 +138,7 @@ class Client {
      * @return boolean
      * @author Lugas Luqman Hakim <lugas.luqman@gmail.com>
      */
-    public function createDir($dirPath)
+    public function createDirectory($dirPath)
     {
         $curl = curl_init();
 
@@ -144,6 +157,16 @@ class Client {
         ));
 
         $response = curl_exec($curl);
+
+        if ($response != "") {
+            $responseArray = Xml2Array::convert($response)->toArray();
+
+            if (isset($responseArray["d:error"])) {
+                throw new ClientException(!empty($responseArray["d:error"]["s:message"]) ? $responseArray["d:error"]["s:message"] : "Directory Create Failed");
+            }
+
+            var_dump($responseArray);
+        }
 
         curl_close($curl);
         // echo $response;
