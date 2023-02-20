@@ -1,0 +1,24 @@
+{
+    "name": "lugasdev/mynextcloud",
+    "description": "crud for nextcloud",
+    "type": "library",
+    "require": {
+        "php": "^5.6",
+        "sabre/dav": "^3.2"
+    },
+    "license": "MTI",
+    "autoload": {
+        "psr-4": {
+            "Lugasdev\\Mynextcloud\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Lugas L H",
+            "email": "lugas.luqman@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^5.7"
+    }
+}
