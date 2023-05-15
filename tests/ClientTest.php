@@ -4,6 +4,7 @@ namespace Lugasdev\Mynextcloud\Tests;
 
 use Dotenv\Dotenv;
 use Lugasdev\Mynextcloud\Client;
+use Lugasdev\Mynextcloud\ShareType;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
@@ -108,11 +109,23 @@ class ClientTest extends TestCase
         }
     }
 
+    public function testCreateShare()
+    {
+        sleep(1);
+        $testFile = strtotime("now") . "_dummy.pdf";
+
+        $this->client->upload("test_directory", __DIR__ . "/dummy.pdf", $testFile);
+
+        $response = $this->client->createShare("test_directory/{$testFile}", ShareType::PUBLIC_LINK);
+
+        $this->assertNotEmpty($response['url']);
+    }
+
     public function testDeleteDirectory()
     {
-            $res = $this->client->delete("test_directory");
+        $res = $this->client->delete("test_directory");
 
-            $this->assertTrue($res);
+        $this->assertTrue($res);
     }
-}
 
+}
