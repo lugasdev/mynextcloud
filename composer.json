@@ -3,9 +3,9 @@
     "description": "crud for nextcloud",
     "type": "library",
     "require": {
-        "php": "^5.6",
-        "sabre/dav": "^3.2",
-        "jackiedo/xml-array": "^1.1"
+        "php": "*",
+        "sabre/dav": "*",
+        "jackiedo/xml-array": "*"
     },
     "license": "MTI",
     "autoload": {
